@@ -44,8 +44,8 @@ import { UserModule } from './module/user/user.module';
           host: 'smtp.gmail.com',
           port: 587,
           auth: {
-            user: config.get<string>('EMAIL_USER'),
-            pass: config.get<string>('EMAIL_PASS'),
+            user: config.get<string>('email.user'),
+            pass: config.get<string>('email.pass'),
           },
         },
       }),
