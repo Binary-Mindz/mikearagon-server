@@ -1,6 +1,6 @@
-# Server Boilerplate
+# Mikearagon Server
 
-A NestJS-based server boilerplate with TypeScript, Prisma PostgreSQL integration, JWT auth, email support, global validation, custom response formatting, and Swagger documentation.
+A NestJS-based server with TypeScript, Prisma PostgreSQL integration, JWT auth, email support, global validation, custom response formatting, and Swagger documentation.
 
 ## Key Features
 
