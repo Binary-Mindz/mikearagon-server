@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -53,57 +51,57 @@ export class AuthService {
 
     const tokens = this.generateTokens(user.id, user.email);
 
-    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    // const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken: hashedRefreshToken },
-    });
+    // await this.prisma.user.update({
+    //   where: { id: user.id },
+    //   data: { refreshToken: hashedRefreshToken },
+    // });
 
     return tokens;
   }
 
-  async refreshToken(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('jwt.refreshSecret'),
-      });
+  // async refreshToken(refreshToken: string) {
+  //   try {
+  //     const payload = this.jwtService.verify(refreshToken, {
+  //       secret: this.configService.get('jwt.refreshSecret'),
+  //     });
 
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
-      });
+  //     const user = await this.prisma.user.findUnique({
+  //       where: { id: payload.sub },
+  //     });
 
-      if (!user || !user.refreshToken) {
-        throw new UnauthorizedException();
-      }
+  //     if (!user || !user.refreshToken) {
+  //       throw new UnauthorizedException();
+  //     }
 
-      const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+  //     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
 
-      if (!isMatch) {
-        throw new UnauthorizedException();
-      }
+  //     if (!isMatch) {
+  //       throw new UnauthorizedException();
+  //     }
 
-      const tokens = this.generateTokens(user.id, user.email);
+  //     const tokens = this.generateTokens(user.id, user.email);
 
-      const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+  //     const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
 
-      await this.prisma.user.update({
-        where: { id: user.id },
-        data: { refreshToken: hashedRefreshToken },
-      });
+  //     await this.prisma.user.update({
+  //       where: { id: user.id },
+  //       data: { refreshToken: hashedRefreshToken },
+  //     });
 
-      return tokens;
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-  }
+  //     return tokens;
+  //   } catch {
+  //     throw new UnauthorizedException('Invalid refresh token');
+  //   }
+  // }
 
-  async logout(userId: string) {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: null },
-    });
+  // async logout(userId: string) {
+  //   await this.prisma.user.update({
+  //     where: { id: userId },
+  //     data: { refreshToken: null },
+  //   });
 
-    return { message: 'Logged out successfully' };
-  }
+  //   return { message: 'Logged out successfully' };
+  // }
 }
