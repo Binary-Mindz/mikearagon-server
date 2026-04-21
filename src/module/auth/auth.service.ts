@@ -98,10 +98,11 @@ export class AuthService {
     });
 
     const token = this.generateVerificationToken();
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     await this.prisma.verificationToken.create({
       data: {
-        token,
+        token: hashedToken,
         userId: user.id,
         expiresAt: new Date(Date.now() + 5 * 60 * 1000),
       },
@@ -113,6 +114,7 @@ export class AuthService {
   }
 
   async verifyEmail(token: string) {
+    token = crypto.createHash('sha256').update(token).digest('hex');
     const record = await this.prisma.verificationToken.findUnique({
       where: { token },
       include: { user: true },
