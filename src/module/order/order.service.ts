@@ -1,5 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ItemStatus } from '@prisma/client';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ItemStatus, OrderStatus } from '@prisma/client';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -119,6 +123,14 @@ export class OrderService {
 
     if (!order) {
       throw new NotFoundException('Order not found');
+    }
+
+    // Check if order is editable
+    if (
+      order.status !== OrderStatus.AVAILABLE &&
+      order.status !== OrderStatus.CREATED
+    ) {
+      throw new BadRequestException('Order is not editable now');
     }
 
     // If updating itemId, check if item exists and is active
