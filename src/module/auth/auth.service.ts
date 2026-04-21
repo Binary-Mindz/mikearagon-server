@@ -20,8 +20,8 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
-  private generateTokens(userId: string, email: string) {
-    const payload = { sub: userId, email };
+  private generateTokens(userId: string, email: string, role: string) {
+    const payload = { sub: userId, email, role };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get('jwt.accessSecret'),
@@ -60,7 +60,7 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
-    const tokens = this.generateTokens(user.id, user.email);
+    const tokens = this.generateTokens(user.id, user.email, user.role);
     return tokens;
   }
 

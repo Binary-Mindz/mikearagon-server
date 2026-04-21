@@ -89,10 +89,10 @@ model Order {
   clientId        String
   itemId          String
   currentDriverId String?
-  currentCity     String
-  deliveryCity    String
+  currentCity     String?
+  deliveryCity    String?
   specialNote     String?
-  status          OrderStatus
+  status          OrderStatus @default(CREATED)
   type            OrderType
 
   client          Client            @relation(fields: [clientId], references: [id])
@@ -190,9 +190,9 @@ model PickupDetails {
 }
 
 model DeliveryDetails {
-  id             String @id @default(uuid())
-  orderId        String @unique
-  serviceType    String
+  id             String  @id @default(uuid())
+  orderId        String  @unique
+  serviceType    String?
   contactName    String
   email          String
   phone          String

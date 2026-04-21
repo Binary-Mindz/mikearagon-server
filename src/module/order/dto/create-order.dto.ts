@@ -1,30 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-
-class AddressDto {
-  @ApiProperty() contactName!: string;
-  @ApiProperty() email!: string;
-  @ApiProperty() phone!: string;
-  @ApiProperty() companyName!: string;
-  @ApiProperty() companyAddress!: string;
-  @ApiProperty() suiteNumber!: string;
-  @ApiProperty() city!: string;
-  @ApiProperty() state!: string;
-  @ApiProperty() zipCode!: string;
-}
+import { OrderType } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { IsEnum, IsString, ValidateNested } from 'class-validator';
+import { OrderAddressDto } from './order-address.dto';
 
 export class CreateOrderDto {
-  @ApiProperty({ enum: ['DELIVERY', 'PICKUP'] })
-  type!: 'DELIVERY' | 'PICKUP';
+  @ApiProperty({ enum: OrderType })
+  @IsEnum(OrderType)
+  type!: OrderType;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '1234567890',
+  })
+  @IsString()
   itemId!: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: false, example: 'Special Note' })
+  @IsString()
   specialNote?: string;
 
-  @ApiProperty({ type: AddressDto })
-  pickupDetails!: AddressDto;
+  @ApiProperty({ type: OrderAddressDto })
+  @ValidateNested()
+  @Type(() => OrderAddressDto)
+  pickupDetails!: OrderAddressDto;
 
-  @ApiProperty({ type: AddressDto })
-  deliveryDetails!: AddressDto;
+  @ApiProperty({ type: OrderAddressDto })
+  @ValidateNested()
+  @Type(() => OrderAddressDto)
+  deliveryDetails!: OrderAddressDto;
 }
