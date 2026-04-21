@@ -10,6 +10,7 @@ import { AuthModule } from './module/auth/auth.module';
 import { EmailService } from './module/email/email.service';
 import { OrderModule } from './module/order/order.module';
 import { UserModule } from './module/user/user.module';
+import { ItemModule } from './module/item/item.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { UserModule } from './module/user/user.module';
     UserModule,
     AuthModule,
     OrderModule,
+    ItemModule,
   ],
   providers: [
     {

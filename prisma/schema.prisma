@@ -76,7 +76,7 @@ model Driver {
 model Item {
   id     String     @id @default(uuid())
   name   String     @unique
-  status ItemStatus
+  status ItemStatus @default(ACTIVE)
 
   orders Order[]
 
