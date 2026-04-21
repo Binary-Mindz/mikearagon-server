@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -18,7 +17,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000'],
     credentials: true,
   });
-  app.useLogger(app.get(Logger));
+  // app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api/v1', {
     exclude: ['/health'],
   });

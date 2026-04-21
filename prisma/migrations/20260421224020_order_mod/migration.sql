@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Order" ALTER COLUMN "currentCity" DROP NOT NULL,
+ALTER COLUMN "deliveryCity" DROP NOT NULL,
+ALTER COLUMN "status" SET DEFAULT 'CREATED';
