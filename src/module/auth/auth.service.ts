@@ -1,8 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { PrismaService } from 'src/database/prisma/prisma.service';
+import { EmailService } from '../email/email.service';
+import { ClientRegisterDto } from './dto/client-register.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,6 +17,7 @@ export class AuthService {
     private prisma: PrismaService,
     private configService: ConfigService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   private generateTokens(userId: string, email: string) {
@@ -26,6 +34,10 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  generateVerificationToken(): string {
+    return crypto.randomBytes(32).toString('hex');
   }
 
   async validateUser(email: string, password: string) {
@@ -48,17 +60,82 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
-
     const tokens = this.generateTokens(user.id, user.email);
-
-    // const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
-
-    // await this.prisma.user.update({
-    //   where: { id: user.id },
-    //   data: { refreshToken: hashedRefreshToken },
-    // });
-
     return tokens;
+  }
+
+  async registerClient(dto: ClientRegisterDto) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new UnauthorizedException('User already exists, please login!');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        password: hashedPassword,
+        role: 'CLIENT',
+        fullName: dto.fullName,
+        phone: dto.phone,
+      },
+    });
+
+    await this.prisma.client.create({
+      data: {
+        userId: user.id,
+        city: dto.city,
+        companyName: dto.companyName,
+        companyAddress: dto.companyAddress,
+        suiteNumber: dto.suiteNumber,
+        state: dto.state,
+        zip: dto.zip,
+        industry: dto.industry,
+      },
+    });
+
+    const token = this.generateVerificationToken();
+
+    await this.prisma.verificationToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      },
+    });
+
+    await this.emailService.sendVerificationEmail(user.email, token);
+
+    return { message: 'Verification email sent successfully' };
+  }
+
+  async verifyEmail(token: string) {
+    const record = await this.prisma.verificationToken.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (!record) {
+      throw new BadRequestException('Invalid token');
+    }
+
+    if (record.expiresAt < new Date()) {
+      throw new BadRequestException('Token expired');
+    }
+
+    await this.prisma.user.update({
+      where: { id: record.userId },
+      data: { isVerified: true },
+    });
+
+    await this.prisma.verificationToken.delete({
+      where: { id: record.id },
+    });
+
+    return { message: 'Email verified successfully' };
   }
 
   // async refreshToken(refreshToken: string) {

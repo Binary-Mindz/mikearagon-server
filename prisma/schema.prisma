@@ -7,19 +7,31 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  fullName String
-  email    String @unique
-  phone    String @unique
-  password String
-  role     Role
+  id         String  @id @default(uuid())
+  fullName   String
+  email      String  @unique
+  phone      String  @unique
+  password   String
+  role       Role
+  isVerified Boolean @default(false)
 
-  client        Client?
-  driver        Driver?
-  notifications Notification[]
+  client             Client?
+  driver             Driver?
+  notifications      Notification[]
+  verificationTokens VerificationToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 model Client {
@@ -33,7 +45,7 @@ model Client {
   zip            String
   industry       String
 
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
 
   createdAt DateTime @default(now())
@@ -50,7 +62,7 @@ model Driver {
   zip     String
   status  DriverStatus
 
-  user               User              @relation(fields: [userId], references: [id])
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders             Order[]           @relation("CurrentDriverOrders")
   assignments        OrderAssignment[]
   history            OrderHistory[]
