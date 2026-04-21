@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ItemStatus } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 
@@ -7,48 +8,60 @@ export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createOrder(dto: CreateOrderDto, clientId: string) {
-    console.log(clientId);
-    // return await this.prisma.$transaction(async (tx) => {
-    const order = await this.prisma.order.create({
-      data: {
-        clientId,
-        itemId: dto.itemId,
-        type: dto.type,
-        specialNote: dto.specialNote,
+    const item = await this.prisma.item.findUnique({
+      where: {
+        id: dto.itemId,
+      },
+      select: {
+        status: true,
       },
     });
 
-    // const pickupDetails = await this.prisma.pickupDetails.create({
-    //   data: {
-    //     orderId: order.id,
-    //     contactName: dto.pickupDetails.contactName,
-    //     companyAddress: dto.pickupDetails.companyAddress,
-    //     companyName: dto.pickupDetails.companyName,
-    //     email: dto.pickupDetails.email,
-    //     suiteNumber: dto.pickupDetails.suiteNumber,
-    //     zipCode: dto.pickupDetails.zipCode,
-    //     city: dto.pickupDetails.city,
-    //     state: dto.pickupDetails.state,
-    //     phone: dto.pickupDetails.phone,
-    //   },
-    // });
+    if (!item || item.status !== ItemStatus.ACTIVE) {
+      throw new NotFoundException('Item not found');
+    }
 
-    // const deliveryDetails = await this.prisma.deliveryDetails.create({
-    //   data: {
-    //     orderId: order.id,
-    //     contactName: dto.pickupDetails.contactName,
-    //     companyAddress: dto.pickupDetails.companyAddress,
-    //     companyName: dto.pickupDetails.companyName,
-    //     email: dto.pickupDetails.email,
-    //     suiteNumber: dto.pickupDetails.suiteNumber,
-    //     zipCode: dto.pickupDetails.zipCode,
-    //     city: dto.pickupDetails.city,
-    //     state: dto.pickupDetails.state,
-    //     phone: dto.pickupDetails.phone,
-    //   },
-    // });
+    return await this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({
+        data: {
+          clientId,
+          itemId: dto.itemId,
+          type: dto.type,
+          specialNote: dto.specialNote,
+        },
+      });
 
-    return order;
-    // });
+      await tx.pickupDetails.create({
+        data: {
+          orderId: order.id,
+          contactName: dto.pickupDetails.contactName,
+          companyAddress: dto.pickupDetails.companyAddress,
+          companyName: dto.pickupDetails.companyName,
+          email: dto.pickupDetails.email,
+          suiteNumber: dto.pickupDetails.suiteNumber,
+          zipCode: dto.pickupDetails.zipCode,
+          city: dto.pickupDetails.city,
+          state: dto.pickupDetails.state,
+          phone: dto.pickupDetails.phone,
+        },
+      });
+
+      await tx.deliveryDetails.create({
+        data: {
+          orderId: order.id,
+          contactName: dto.pickupDetails.contactName,
+          companyAddress: dto.pickupDetails.companyAddress,
+          companyName: dto.pickupDetails.companyName,
+          email: dto.pickupDetails.email,
+          suiteNumber: dto.pickupDetails.suiteNumber,
+          zipCode: dto.pickupDetails.zipCode,
+          city: dto.pickupDetails.city,
+          state: dto.pickupDetails.state,
+          phone: dto.pickupDetails.phone,
+        },
+      });
+
+      return order;
+    });
   }
 }
