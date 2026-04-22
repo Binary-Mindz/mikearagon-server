@@ -108,6 +108,33 @@ export class OrderService {
     });
   }
 
+  async getMyOrderDetails(id: string, clientId: string) {
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id,
+        clientId,
+      },
+      select: {
+        id: true,
+        type: true,
+        specialNote: true,
+        item: {
+          select: {
+            name: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return ApiResponse.success('Order fetched successfully', order);
+  }
+
   async updateOrder(orderId: string, dto: UpdateOrderDto, clientId: string) {
     // Check if order exists and belongs to client
     const order = await this.prisma.order.findFirst({
