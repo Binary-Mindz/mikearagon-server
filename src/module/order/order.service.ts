@@ -7,6 +7,7 @@ import { ItemStatus, OrderStatus } from '@prisma/client';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { DateFilter, GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Injectable()
@@ -71,28 +72,79 @@ export class OrderService {
     });
   }
 
-  async getMyOrders(clientId: string, page: number = 1, limit: number = 10) {
+  async getMyOrders(clientId: string, query: GetOrdersQueryDto) {
+    const { page, limit } = query;
     const skip = (page - 1) * limit;
+
+    // Build where clause
+    const where: {
+      clientId: string;
+      OR?: any[];
+      createdAt?: { gte: Date };
+    } = {
+      clientId,
+    };
+
+    // Search functionality
+    if (query.search) {
+      const searchTerm = query.search.toLowerCase().trim();
+      const searchConditions: any[] = [
+        { id: { contains: searchTerm, mode: 'insensitive' } },
+        { item: { name: { contains: searchTerm, mode: 'insensitive' } } },
+      ];
+
+      where.OR = searchConditions;
+    }
+
+    // Date filter functionality
+    if (query.dateFilter) {
+      const now = new Date();
+      let startDate: Date;
+
+      switch (query.dateFilter) {
+        case DateFilter.LAST_3_DAYS:
+          startDate = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+          break;
+        case DateFilter.LAST_7_DAYS:
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case DateFilter.LAST_30_DAYS:
+          startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case DateFilter.LAST_90_DAYS:
+          startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // default to 7 days
+      }
+
+      where.createdAt = {
+        gte: startDate,
+      };
+    }
 
     const [orders, count] = await this.prisma.$transaction([
       this.prisma.order.findMany({
-        where: {
-          clientId,
-        },
+        where,
         skip,
         take: limit,
         orderBy: {
           createdAt: 'desc',
         },
         include: {
+          item: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           pickupDetails: true,
           deliveryDetails: true,
+          currentDriver: true,
         },
       }),
       this.prisma.order.count({
-        where: {
-          clientId,
-        },
+        where,
       }),
     ]);
 

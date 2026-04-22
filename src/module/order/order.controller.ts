@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
@@ -12,6 +13,7 @@ import { CurrentClient } from 'src/common/decorators/get-client.decorator';
 import { ProfileGuard } from 'src/common/guards/profile.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
 
@@ -32,8 +34,11 @@ export class OrderController {
   @ApiOperation({ summary: 'Get my orders list as client' })
   @UseGuards(JwtAuthGuard, ProfileGuard)
   @Get('client/my')
-  getMyOrders(@CurrentClient('id') clientId: string) {
-    return this.orderService.getMyOrders(clientId);
+  getMyOrders(
+    @CurrentClient('id') clientId: string,
+    @Query() query: GetOrdersQueryDto,
+  ) {
+    return this.orderService.getMyOrders(clientId, query);
   }
 
   @ApiOperation({ summary: 'Get my order details as client' })
