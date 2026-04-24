@@ -6,9 +6,9 @@ import {
 import { ItemStatus, OrderStatus } from '@prisma/client';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { DateFilter, GetOrdersQueryDto } from './dto/get-orders-query.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { DateFilter, GetOrdersQueryDto } from '../dto/get-orders-query.dto';
+import { UpdateOrderDto } from '../dto/update-order.dto';
 
 @Injectable()
 export class OrderService {

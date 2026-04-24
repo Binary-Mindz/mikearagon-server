@@ -15,7 +15,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { OrderService } from './order.service';
+import { OrderService } from './services/client-order.service';
 
 @Controller('order')
 export class OrderController {
