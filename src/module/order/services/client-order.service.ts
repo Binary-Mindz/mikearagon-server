@@ -303,4 +303,43 @@ export class ClientOrderService {
       return ApiResponse.success('Order updated successfully', finalOrder);
     });
   }
+
+  // cancel order by client before pickup
+  async cancelOrder(orderId: string, clientId: string) {
+    // Check if order exists and belongs to client
+    const order = await this.prisma.order.findFirst({
+      where: {
+        id: orderId,
+        clientId,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // Check if order is already cancelled
+    if (order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Order is already cancelled');
+    }
+
+    // Check if order is cancelable
+    if (
+      order.status !== OrderStatus.AVAILABLE &&
+      order.status !== OrderStatus.CREATED
+    ) {
+      throw new BadRequestException('Order is not cancelable now');
+    }
+
+    await this.prisma.order.update({
+      where: {
+        id: orderId,
+      },
+      data: {
+        status: OrderStatus.CANCELLED,
+      },
+    });
+
+    return ApiResponse.success('Order cancelled successfully');
+  }
 }

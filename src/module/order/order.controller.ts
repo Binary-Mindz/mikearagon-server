@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CurrentClient } from 'src/common/decorators/get-client.decorator';
 import { ProfileGuard } from 'src/common/guards/profile.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -43,6 +43,7 @@ export class OrderController {
 
   @ApiOperation({ summary: 'Get my order details as client' })
   @UseGuards(JwtAuthGuard, ProfileGuard)
+  @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Get('client/my/:id')
   getMyOrderDetails(
     @Param('id') id: string,
@@ -53,6 +54,7 @@ export class OrderController {
 
   @ApiOperation({ summary: 'Update order by client' })
   @UseGuards(JwtAuthGuard, ProfileGuard)
+  @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Patch(':id')
   updateOrder(
     @Param('id') orderId: string,
@@ -60,5 +62,17 @@ export class OrderController {
     @CurrentClient('id') clientId: string,
   ) {
     return this.orderService.updateOrder(orderId, updateOrderDto, clientId);
+  }
+
+  // cancel order by client before pickup
+  @ApiOperation({ summary: 'Cancel order by client' })
+  @UseGuards(JwtAuthGuard, ProfileGuard)
+  @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
+  @Patch(':id/cancel')
+  cancelOrder(
+    @Param('id') orderId: string,
+    @CurrentClient('id') clientId: string,
+  ) {
+    return this.orderService.cancelOrder(orderId, clientId);
   }
 }
