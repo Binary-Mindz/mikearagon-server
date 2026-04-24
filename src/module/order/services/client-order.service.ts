@@ -11,7 +11,7 @@ import { DateFilter, GetOrdersQueryDto } from '../dto/get-orders-query.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 
 @Injectable()
-export class OrderService {
+export class ClientOrderService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createOrder(dto: CreateOrderDto, clientId: string) {

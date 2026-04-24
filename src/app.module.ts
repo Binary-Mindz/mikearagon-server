@@ -8,9 +8,9 @@ import { validationSchema } from './config/validation';
 import { PrismaModule } from './database/prisma/prisma.module';
 import { AuthModule } from './module/auth/auth.module';
 import { EmailService } from './module/email/email.service';
+import { ItemModule } from './module/item/item.module';
 import { OrderModule } from './module/order/order.module';
 import { UserModule } from './module/user/user.module';
-import { ItemModule } from './module/item/item.module';
 
 @Module({
   imports: [
@@ -19,17 +19,7 @@ import { ItemModule } from './module/item/item.module';
       load: [configuration],
       validationSchema,
     }),
-    // LoggerModule.forRoot({
-    //   pinoHttp: {
-    //     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    //     transport:
-    //       process.env.NODE_ENV !== 'production'
-    //         ? {
-    //             target: 'pino-pretty',
-    //           }
-    //         : undefined,
-    //   },
-    // }),
+
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -56,6 +46,17 @@ import { ItemModule } from './module/item/item.module';
     AuthModule,
     OrderModule,
     ItemModule,
+    // LoggerModule.forRoot({
+    //   pinoHttp: {
+    //     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    //     transport:
+    //       process.env.NODE_ENV !== 'production'
+    //         ? {
+    //             target: 'pino-pretty',
+    //           }
+    //         : undefined,
+    //   },
+    // }),
   ],
   providers: [
     {

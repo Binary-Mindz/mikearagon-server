@@ -15,11 +15,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { OrderService } from './services/client-order.service';
+import { ClientOrderService } from './services/client-order.service';
 
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: ClientOrderService) {}
 
   @ApiOperation({ summary: 'Create order by client' })
   @UseGuards(JwtAuthGuard, ProfileGuard)
