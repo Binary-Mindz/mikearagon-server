@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateItemDto } from './dto/create-item.dto';
 
@@ -13,6 +14,6 @@ export class ItemService {
       },
     });
 
-    return item;
+    return ApiResponse.success('Item created successfully', item);
   }
 }

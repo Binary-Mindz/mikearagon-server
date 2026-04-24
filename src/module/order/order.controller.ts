@@ -21,7 +21,7 @@ import { OrderService } from './services/client-order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @ApiOperation({ summary: 'Create order' })
+  @ApiOperation({ summary: 'Create order by client' })
   @UseGuards(JwtAuthGuard, ProfileGuard)
   @Post()
   create(
@@ -51,7 +51,7 @@ export class OrderController {
     return this.orderService.getMyOrderDetails(id, clientId);
   }
 
-  @ApiOperation({ summary: 'Update order' })
+  @ApiOperation({ summary: 'Update order by client' })
   @UseGuards(JwtAuthGuard, ProfileGuard)
   @Patch(':id')
   updateOrder(

@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { OrderStatus } from '@prisma/client';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export enum DateFilter {
@@ -34,6 +35,15 @@ export class GetOrdersQueryDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter orders by status',
+    enum: OrderStatus,
+    example: OrderStatus.CREATED,
+  })
+  @IsOptional()
+  @IsEnum(OrderStatus)
+  status?: OrderStatus;
 
   @ApiPropertyOptional({
     enum: DateFilter,

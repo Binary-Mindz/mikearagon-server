@@ -79,6 +79,7 @@ export class OrderService {
     // Build where clause
     const where: {
       clientId: string;
+      status?: OrderStatus;
       OR?: any[];
       createdAt?: { gte: Date };
     } = {
@@ -94,6 +95,11 @@ export class OrderService {
       ];
 
       where.OR = searchConditions;
+    }
+
+    // Status filter functionality
+    if (query.status) {
+      where.status = query.status;
     }
 
     // Date filter functionality
