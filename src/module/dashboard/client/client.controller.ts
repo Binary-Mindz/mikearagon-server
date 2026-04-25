@@ -1,5 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CurrentClient } from 'src/common/decorators/get-client.decorator';
 import { ProfileGuard } from 'src/common/guards/profile.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -16,5 +16,16 @@ export class ClientController {
   @UseGuards(JwtAuthGuard, RolesGuard, ProfileGuard)
   getStats(@CurrentClient('id') clientId: string) {
     return this.clientService.getStats(clientId);
+  }
+
+  @ApiOperation({ summary: 'Get Client Analytics' })
+  @Get('analytics')
+  @UseGuards(JwtAuthGuard, RolesGuard, ProfileGuard)
+  @ApiQuery({ name: 'filter', enum: ['daily', 'weekly', 'monthly'] })
+  getAnalytics(
+    @CurrentClient('id') clientId: string,
+    @Query('filter') filter: 'daily' | 'weekly' | 'monthly',
+  ) {
+    return this.clientService.getAnalytics(clientId, filter);
   }
 }
