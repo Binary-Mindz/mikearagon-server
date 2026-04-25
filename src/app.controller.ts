@@ -1,8 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 import { ApiResponse } from './common/response/api-response';
 
 @Controller()
 export class AppController {
+  @ApiOperation({ summary: 'Health check' })
   @Get()
   healthCheck() {
     return ApiResponse.success('Health check', {
