@@ -14,6 +14,10 @@ export class ClientRegisterDto {
   @IsString()
   phone!: string;
 
+  @ApiProperty({ example: '12345678' })
+  @IsString()
+  password!: string;
+
   @ApiProperty({ example: 'Example Company' })
   @IsString()
   companyName!: string;
@@ -41,8 +45,4 @@ export class ClientRegisterDto {
   @ApiProperty({ example: 'IT' })
   @IsString()
   industry!: string;
-
-  @ApiProperty({ example: '12345678' })
-  @IsString()
-  password!: string;
 }
