@@ -5,6 +5,7 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UpdateClientAddressDto } from './dto/update-client-address.dto';
 import { UpdatePersonalInfoDto } from './dto/update-personal.dto';
 import { UserService } from './user.service';
 
@@ -28,5 +29,16 @@ export class UserController {
     @Body() dto: UpdatePersonalInfoDto,
   ) {
     return this.userService.updatePersonalInfo(userId, dto);
+  }
+
+  @ApiOperation({ summary: 'Update client address' })
+  @Patch('client-address')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.CLIENT)
+  updateClientAddress(
+    @GetUser('sub') userId: string,
+    @Body() dto: UpdateClientAddressDto,
+  ) {
+    return this.userService.updateClientAddress(userId, dto);
   }
 }

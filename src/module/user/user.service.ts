@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
@@ -43,5 +44,14 @@ export class UserService {
     });
 
     return ApiResponse.success('Personal info updated successfully', user);
+  }
+
+  async updateClientAddress(userId: string, dto: any) {
+    const client = await this.prisma.client.update({
+      where: { userId },
+      data: dto,
+    });
+
+    return ApiResponse.success('Client address updated successfully', client);
   }
 }
