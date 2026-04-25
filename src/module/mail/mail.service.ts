@@ -26,8 +26,8 @@ export class MailService {
 
   private compileTemplate(templateName: string, context: any): string {
     const templatePath = path.join(
-      __dirname,
-      'templates',
+      process.cwd(),
+      'src/module/mail/templates',
       `${templateName}.hbs`,
     );
 
@@ -42,7 +42,7 @@ export class MailService {
 
     try {
       await this.transporter.sendMail({
-        from: 'Pet Care <' + this.configService.get<string>('email.user') + '>',
+        from: 'Nexus <' + this.configService.get<string>('email.user') + '>',
         to: options.to,
         subject: options.subject,
         html,
@@ -53,5 +53,19 @@ export class MailService {
       this.logger.error(`Email sending failed`, error);
       throw error;
     }
+  }
+
+  async sendVerificationEmail(to: string, token: string, name = 'User') {
+    return this.sendMail({
+      to,
+      subject: 'Verify Your Email',
+      template: 'email-verification',
+      context: {
+        name: name,
+        appName: 'Nexus Courier Group',
+        verificationLink: `http://localhost:3000/auth/verify?token=${token}`,
+        year: new Date().getFullYear(),
+      },
+    });
   }
 }
