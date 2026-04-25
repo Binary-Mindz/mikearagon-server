@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AppController } from './app.controller';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation';
 import { PrismaModule } from './database/prisma/prisma.module';
@@ -65,5 +66,6 @@ import { UserModule } from './module/user/user.module';
     },
     EmailService,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
