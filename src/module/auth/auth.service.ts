@@ -8,7 +8,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { PrismaService } from 'src/database/prisma/prisma.service';
-import { EmailService } from '../email/email.service';
 import { ClientRegisterDto } from './dto/client-register.dto';
 
 @Injectable()
@@ -17,7 +16,6 @@ export class AuthService {
     private prisma: PrismaService,
     private configService: ConfigService,
     private jwtService: JwtService,
-    private emailService: EmailService,
   ) {}
 
   private generateTokens(userId: string, email: string, role: string) {
@@ -108,7 +106,7 @@ export class AuthService {
       },
     });
 
-    await this.emailService.sendVerificationEmail(user.email, token);
+    // await this.emailService.sendVerificationEmail(user.email, token);
 
     return { message: 'Verification email sent successfully' };
   }
