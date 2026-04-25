@@ -1,14 +1,17 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { ClientRegisterDto } from './dto/client-register.dto';
 
 @Injectable()
@@ -144,47 +147,22 @@ export class AuthService {
     return { message: 'Email verified successfully' };
   }
 
-  // async refreshToken(refreshToken: string) {
-  //   try {
-  //     const payload = this.jwtService.verify(refreshToken, {
-  //       secret: this.configService.get('jwt.refreshSecret'),
-  //     });
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('User not found');
 
-  //     const user = await this.prisma.user.findUnique({
-  //       where: { id: payload.sub },
-  //     });
+    const isMatch = await bcrypt.compare(dto.password, user.password);
+    if (!isMatch) throw new BadRequestException('Old password is incorrect');
 
-  //     if (!user || !user.refreshToken) {
-  //       throw new UnauthorizedException();
-  //     }
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
 
-  //     const isMatch = await bcrypt.compare(refreshToken, user.refreshToken);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
 
-  //     if (!isMatch) {
-  //       throw new UnauthorizedException();
-  //     }
-
-  //     const tokens = this.generateTokens(user.id, user.email);
-
-  //     const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
-
-  //     await this.prisma.user.update({
-  //       where: { id: user.id },
-  //       data: { refreshToken: hashedRefreshToken },
-  //     });
-
-  //     return tokens;
-  //   } catch {
-  //     throw new UnauthorizedException('Invalid refresh token');
-  //   }
-  // }
-
-  // async logout(userId: string) {
-  //   await this.prisma.user.update({
-  //     where: { id: userId },
-  //     data: { refreshToken: null },
-  //   });
-
-  //   return { message: 'Logged out successfully' };
-  // }
+    return ApiResponse.success('Password changed successfully');
+  }
 }
