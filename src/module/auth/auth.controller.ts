@@ -10,6 +10,7 @@ import { ClientRegisterDto } from './dto/client-register.dto';
 import { DriverRegisterDto } from './dto/driver-register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyTokenTypeDto } from './dto/verify-token-type.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -59,8 +60,15 @@ export class AuthController {
     return this.authService.changePassword(userId, dto);
   }
 
+  @ApiOperation({ summary: 'Forgot password' })
   @Post('forgot-password')
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.authService.forgotPassword(dto.email);
+  }
+
+  @ApiOperation({ summary: 'Reset password' })
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 }

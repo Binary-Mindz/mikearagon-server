@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   ConflictException,
@@ -17,6 +19,7 @@ import { MailService } from '../mail/mail.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ClientRegisterDto } from './dto/client-register.dto';
 import { DriverRegisterDto } from './dto/driver-register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -212,7 +215,19 @@ export class AuthService {
       where: { id: record.id },
     });
 
-    return { message: 'Email verified successfully' };
+    if (type === 'token') {
+      return ApiResponse.success('Email verified successfully');
+    } else {
+      const payload = { sub: record.userId, email: record.user.email };
+      const accessToken = this.jwtService.sign(payload, {
+        secret: this.configService.get('jwt.accessSecret'),
+        expiresIn: this.configService.get('jwt.accessExpiresIn'),
+      });
+
+      return ApiResponse.success('OTP verified successfully', {
+        token: accessToken,
+      });
+    }
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto) {
@@ -253,5 +268,23 @@ export class AuthService {
 
     await this.emailService.sendForgotPasswordEmail(email, otp, user.fullName);
     return ApiResponse.success('Password reset code sent successfully');
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const payload = this.jwtService.verify(dto.token);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    });
+
+    return ApiResponse.success('Password reset successfully');
   }
 }
