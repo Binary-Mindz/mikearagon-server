@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ItemStatus, OrderStatus } from '@prisma/client';
+import { ItemStatus, OrderStatus, Role } from '@prisma/client';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
@@ -35,6 +35,8 @@ export class ClientOrderService {
           itemId: dto.itemId,
           type: dto.type,
           specialNote: dto.specialNote,
+          createdById: clientId,
+          createdByRole: Role.CLIENT,
         },
       });
 

@@ -13,6 +13,7 @@ model User {
   phone      String  @unique
   password   String
   role       Role
+  profileImg String?
   isVerified Boolean @default(false)
 
   client             Client?
@@ -86,7 +87,7 @@ model Item {
 
 model Order {
   id              String      @id @default(uuid())
-  clientId        String
+  clientId        String?
   itemId          String
   currentDriverId String?
   currentCity     String?
@@ -94,8 +95,10 @@ model Order {
   specialNote     String?
   status          OrderStatus @default(CREATED)
   type            OrderType
+  createdById     String
+  createdByRole   OrderRole
 
-  client          Client            @relation(fields: [clientId], references: [id])
+  client          Client?           @relation(fields: [clientId], references: [id])
   item            Item              @relation(fields: [itemId], references: [id])
   currentDriver   Driver?           @relation("CurrentDriverOrders", fields: [currentDriverId], references: [id])
   orderTransfers  OrderTransfer[]
@@ -245,4 +248,9 @@ enum TransferStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum OrderRole {
+  CLIENT
+  ADMIN
 }
