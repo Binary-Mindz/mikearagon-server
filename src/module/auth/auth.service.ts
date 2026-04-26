@@ -255,7 +255,6 @@ export class AuthService {
     });
     if (!user) throw new NotFoundException('User not found');
 
-    // have to make a 4 digit code
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await this.prisma.verificationToken.create({

@@ -66,7 +66,7 @@ export class AuthController {
     return this.authService.forgotPassword(dto.email);
   }
 
-  @ApiOperation({ summary: 'Reset password' })
+  @ApiOperation({ summary: 'Reset password after otp' })
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
