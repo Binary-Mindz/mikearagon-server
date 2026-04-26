@@ -70,6 +70,20 @@ export class MailService {
     });
   }
 
+  async sendForgotPasswordEmail(to: string, code: string, name: string) {
+    return this.sendMail({
+      to,
+      subject: 'Password Reset Code',
+      template: 'otp',
+      context: {
+        ...this.generalContext,
+        name,
+        otp: code,
+        expiry: 5,
+      },
+    });
+  }
+
   async sendDriverRegistrationEmail(
     to: string,
     name = 'User',

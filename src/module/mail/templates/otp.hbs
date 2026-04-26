@@ -2,170 +2,107 @@
   <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-    <title>Verify Your Account</title>
+    <title>Reset Your Password</title>
   </head>
 
   <body
-    style="
-      margin: 0;
-      padding: 0;
-      background-color: #f6f7f9;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-    "
+    style='margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f5f5f5;'
   >
-    <table width='100%' cellpadding='0' cellspacing='0'>
+
+    <!-- Wrapper -->
+
+    <table
+      width='100%'
+      cellpadding='0'
+      cellspacing='0'
+      style='background-color:#f5f5f5; padding:20px 0;'
+    >
       <tr>
-        <td align='center' style='padding: 30px 16px'>
-          <!-- Main Card -->
+        <td align='center'>
+          <!-- Main Container -->
           <table
-            width='100%'
+            width='500'
             cellpadding='0'
             cellspacing='0'
-            style='
-              max-width: 520px;
-              background: #ffffff;
-              border-radius: 16px;
-              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-              overflow: hidden;
-            '
+            style='background:#ffffff; border-radius:10px; overflow:hidden;'
           >
+
             <!-- Header -->
             <tr>
-              <td
-                style='
-                  padding: 24px;
-                  background: linear-gradient(
-                    135deg,
-                    #ff8fa3,
-                    #ffb3c1
-                  );
-                  color: #ffffff;
-                  text-align: center;
-                '
-              >
-                <h1
-                  style='
-                    margin: 0;
-                    font-size: 20px;
-                    font-weight: 600;
-                  '
-                >
-                  🐾 Verify Your Account
-                </h1>
-                <p
-                  style='
-                    margin: 8px 0 0;
-                    font-size: 14px;
-                    opacity: 0.95;
-                  '
-                >
-                  Caring for your pet starts here
-                </p>
+              <td style='background:#c62828; color:#ffffff; padding:20px;'>
+                <h2 style='margin:0;'>{{appName}}</h2>
+                <p style='margin:5px 0 0;'>Password Reset Request</p>
               </td>
             </tr>
 
             <!-- Body -->
             <tr>
-              <td style='padding: 28px 24px'>
-                <p
-                  style='
-                    margin: 0 0 12px;
-                    font-size: 15px;
-                    color: #333333;
-                  '
-                >
-                  Hi
-                  {{name}},
+              <td style='padding:30px;'>
+
+                <h3 style='margin-top:0;'>Hello {{name}}, 👋</h3>
+
+                <p style='color:#555;'>
+                  We received a request to reset your password. Use the
+                  verification code below to proceed.
                 </p>
 
-                <p
-                  style='
-                    margin: 0 0 20px;
-                    font-size: 15px;
-                    color: #555555;
-                    line-height: 1.6;
-                  '
+                <!-- OTP Card -->
+                <table
+                  align='center'
+                  width='100%'
+                  cellpadding='0'
+                  cellspacing='0'
+                  style='background:#f9f9f9; border-radius:8px; padding:25px; margin:25px 0; text-align:center;'
                 >
-                  Please use the verification code below to complete your
-                  sign-in. This helps us keep your account secure.
+                  <tr>
+                    <td>
+
+                      <p style='margin:0 0 10px; color:#888; font-size:14px;'>
+                        Your verification code
+                      </p>
+
+                      <!-- OTP -->
+                      <div
+                        style='font-size:32px; letter-spacing:8px; font-weight:bold; color:#c62828;'
+                      >
+                        {{otp}}
+                      </div>
+
+                      <p style='margin-top:15px; font-size:13px; color:#888;'>
+                        This code will expire in
+                        {{expiry}}
+                        minutes
+                      </p>
+
+                    </td>
+                  </tr>
+                </table>
+
+                <p style='color:#777; font-size:14px;'>
+                  If you didn’t request a password reset, you can safely ignore
+                  this email.
                 </p>
 
-                <!-- OTP Box -->
-                <div
-                  style='
-                    background: #fff0f3;
-                    border: 1px dashed #ff8fa3;
-                    border-radius: 12px;
-                    text-align: center;
-                    padding: 18px 0;
-                    margin: 24px 0;
-                  '
-                >
-                  <span
-                    style='
-                      font-size: 28px;
-                      font-weight: 700;
-                      letter-spacing: 6px;
-                      color: #ff5d7d;
-                    '
-                  >
-                    {{code}}
-                  </span>
-                </div>
-
-                <p
-                  style='
-                    margin: 0 0 10px;
-                    font-size: 14px;
-                    color: #666666;
-                  '
-                >
-                  ⏱ This code will expire in
-                  <strong>{{expiresIn}}</strong>
-                  minutes.
-                </p>
-
-                <p
-                  style='
-                    margin: 0;
-                    font-size: 14px;
-                    color: #888888;
-                  '
-                >
-                  If you didn’t request this, you can safely ignore this email.
-                </p>
               </td>
             </tr>
 
             <!-- Footer -->
             <tr>
               <td
-                style='
-                  padding: 18px;
-                  background-color: #fafafa;
-                  text-align: center;
-                  font-size: 12px;
-                  color: #999999;
-                '
+                style='background:#f1f1f1; text-align:center; padding:15px; font-size:12px; color:#888;'
               >
                 ©
                 {{year}}
-                RichardHan • Easier Pet Care
-                <br />
-                Need help?
-                <a
-                  href='mailto:support@richardhan.com'
-                  style='
-                    color: #ff5d7d;
-                    text-decoration: none;
-                  '
-                >Contact Support</a>
+                {{appName}}. All rights reserved.
               </td>
             </tr>
+
           </table>
+
         </td>
       </tr>
+
     </table>
+
   </body>
 </html>

@@ -184,8 +184,10 @@ export class AuthService {
     return { message: 'Verification email sent successfully' };
   }
 
-  async verifyEmail(token: string) {
-    token = crypto.createHash('sha256').update(token).digest('hex');
+  async verifyEmail(token: string, type: string) {
+    if (type === 'token') {
+      token = crypto.createHash('sha256').update(token).digest('hex');
+    }
     const record = await this.prisma.verificationToken.findUnique({
       where: { token },
       include: { user: true },
@@ -199,10 +201,12 @@ export class AuthService {
       throw new BadRequestException('Token expired');
     }
 
-    await this.prisma.user.update({
-      where: { id: record.userId },
-      data: { isVerified: true },
-    });
+    if (type === 'token') {
+      await this.prisma.user.update({
+        where: { id: record.userId },
+        data: { isVerified: true },
+      });
+    }
 
     await this.prisma.verificationToken.delete({
       where: { id: record.id },
@@ -228,5 +232,26 @@ export class AuthService {
     });
 
     return ApiResponse.success('Password changed successfully');
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    // have to make a 4 digit code
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await this.prisma.verificationToken.create({
+      data: {
+        token: otp,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      },
+    });
+
+    await this.emailService.sendForgotPasswordEmail(email, otp, user.fullName);
+    return ApiResponse.success('Password reset code sent successfully');
   }
 }
