@@ -1,9 +1,13 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ClientRegisterDto } from './dto/client-register.dto';
+import { DriverRegisterDto } from './dto/driver-register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -15,6 +19,14 @@ export class AuthController {
   @Post('register/client')
   registerClient(@Body() dto: ClientRegisterDto) {
     return this.authService.registerClient(dto);
+  }
+
+  @ApiOperation({ summary: 'Driver registration for Admin' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Post('register/driver')
+  registerDriver(@Body() dto: DriverRegisterDto) {
+    return this.authService.registerDriver(dto);
   }
 
   @ApiOperation({ summary: 'Email verification' })

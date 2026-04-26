@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
@@ -37,6 +34,11 @@ export class MailService {
     return template(context);
   }
 
+  private readonly generalContext = {
+    appName: 'Nexus Courier Group',
+    year: new Date().getFullYear(),
+  };
+
   async sendMail(options: SendMailOptions): Promise<void> {
     const html = this.compileTemplate(options.template, options.context);
 
@@ -61,10 +63,29 @@ export class MailService {
       subject: 'Verify Your Email',
       template: 'email-verification',
       context: {
+        ...this.generalContext,
         name: name,
-        appName: 'Nexus Courier Group',
         verificationLink: `http://localhost:3000/auth/verify?token=${token}`,
-        year: new Date().getFullYear(),
+      },
+    });
+  }
+
+  async sendDriverRegistrationEmail(
+    to: string,
+    name = 'User',
+    email: string,
+    password: string,
+  ) {
+    return this.sendMail({
+      to,
+      subject: 'Your Driver Account is Ready',
+      template: 'driver-credential',
+      context: {
+        ...this.generalContext,
+        name: name,
+        email: email,
+        password,
+        loginLink: 'http://localhost:3000/login',
       },
     });
   }
