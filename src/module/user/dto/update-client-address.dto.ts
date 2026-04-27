@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { USState } from 'src/common/enums/us-state.enum';
 
 export class UpdateClientAddressDto {
   @ApiPropertyOptional({
@@ -9,12 +10,9 @@ export class UpdateClientAddressDto {
   @IsString()
   companyAddress?: string;
 
-  @ApiPropertyOptional({
-    example: 'Nevada',
-  })
-  @IsOptional()
-  @IsString()
-  state?: string;
+  @ApiPropertyOptional({ example: USState.NV })
+  @IsEnum(USState, { message: 'Invalid US state' })
+  state!: USState;
 
   @ApiPropertyOptional({
     example: 'Las Vegas',

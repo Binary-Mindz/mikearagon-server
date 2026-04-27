@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { DriverStatus } from '@prisma/client';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { USState } from 'src/common/enums/us-state.enum';
 
 export class DriverRegisterDto {
   @ApiProperty({
@@ -39,12 +40,9 @@ export class DriverRegisterDto {
   @IsString()
   address!: string;
 
-  @ApiProperty({
-    example: 'New York',
-    required: true,
-  })
-  @IsString()
-  state!: string;
+  @ApiProperty({ example: USState.NV })
+  @IsEnum(USState, { message: 'Invalid US state' })
+  state!: USState;
 
   @ApiProperty({
     example: 'New York',

@@ -35,17 +35,18 @@ export class ProfileGuard implements CanActivate {
         break;
       }
 
-      // case 'PET_HOTEL': {
-      //   const hotel = await this.prisma.hotelProfile.findUnique({
-      //     where: { userId: user.id },
-      //   });
-      //   if (!hotel) throw new ForbiddenException('Hotel profile not found');
+      case 'DRIVER': {
+        const driver = await this.prisma.driver.findUnique({
+          where: { userId: user.sub },
+        });
+        if (!driver) throw new ForbiddenException('Driver not found');
 
-      //   request.hotelProfile = {
-      //     id: hotel.id,
-      //   };
-      //   break;
-      // }
+        // attach to request
+        request.driver = {
+          id: driver.id,
+        };
+        break;
+      }
 
       default:
         throw new ForbiddenException('Invalid role');
