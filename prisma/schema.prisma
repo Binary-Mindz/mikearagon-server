@@ -40,6 +40,7 @@ model Client {
   userId         String  @unique
   companyName    String
   companyAddress String
+  companyLogo    String?
   suiteNumber    String
   city           String
   state          USState
