@@ -16,4 +16,9 @@ export class ItemService {
 
     return ApiResponse.success('Item created successfully', item);
   }
+
+  async findAll() {
+    const items = await this.prisma.item.findMany();
+    return ApiResponse.success('Items fetched successfully', items);
+  }
 }
