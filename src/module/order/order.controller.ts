@@ -12,6 +12,7 @@ import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CurrentClient } from 'src/common/decorators/get-client.decorator';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { SearchPaginationDto } from 'src/common/dto/search-pagination.dto';
 import { Role } from 'src/common/enums/role.enum';
 import { ProfileGuard } from 'src/common/guards/profile.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -22,6 +23,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { AdminOrderService } from './services/admin-order.service';
 import { ClientOrderService } from './services/client-order.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('order')
 export class OrderController {
   constructor(
@@ -30,7 +32,7 @@ export class OrderController {
   ) {}
 
   @ApiOperation({ summary: 'Create order by client' })
-  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
+  @UseGuards(ProfileGuard, RolesGuard)
   @Roles(Role.CLIENT)
   @Post('client')
   create(
@@ -41,7 +43,7 @@ export class OrderController {
   }
 
   @ApiOperation({ summary: 'Create order by Admin' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
   @Post('admin')
   createByAdmin(
@@ -52,7 +54,7 @@ export class OrderController {
   }
 
   @ApiOperation({ summary: 'Get my orders list as client or admin' })
-  @UseGuards(JwtAuthGuard, RolesGuard, ProfileGuard)
+  @UseGuards(RolesGuard, ProfileGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
   @Get('client/my')
   getMyOrders(
@@ -64,7 +66,7 @@ export class OrderController {
   }
 
   @ApiOperation({ summary: 'Get my order details' })
-  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
+  @UseGuards(ProfileGuard, RolesGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
   @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Get('my/:id')
@@ -76,8 +78,16 @@ export class OrderController {
     return this.orderService.getMyOrderDetails(id, clientId, userId);
   }
 
+  @ApiOperation({ summary: "Get all other client's orders as admin" })
+  @Get('others')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  getOthersOrders(@Query() query: SearchPaginationDto) {
+    return this.adminOrderService.getOthersOrders(query);
+  }
+
   @ApiOperation({ summary: 'Update order by client or admin' })
-  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
+  @UseGuards(ProfileGuard, RolesGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
   @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Patch(':id')
@@ -97,7 +107,7 @@ export class OrderController {
 
   // cancel order by client before pickup
   @ApiOperation({ summary: 'Cancel order by client or admin' })
-  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
+  @UseGuards(ProfileGuard, RolesGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
   @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Patch(':id/cancel')
