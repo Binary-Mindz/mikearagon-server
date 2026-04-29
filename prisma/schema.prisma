@@ -7,33 +7,47 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  fullName String
-  email    String @unique
-  phone    String @unique
-  password String
-  role     Role
+  id         String  @id @default(uuid())
+  fullName   String
+  email      String  @unique
+  phone      String  @unique
+  password   String
+  role       Role
+  profileImg String?
+  isVerified Boolean @default(false)
 
-  client        Client?
-  driver        Driver?
-  notifications Notification[]
+  client             Client?
+  driver             Driver?
+  notifications      Notification[]
+  verificationTokens VerificationToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model VerificationToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model Client {
-  id             String @id @default(uuid())
-  userId         String @unique
+  id             String  @id @default(uuid())
+  userId         String  @unique
   companyName    String
   companyAddress String
+  companyLogo    String?
   suiteNumber    String
   city           String
-  state          String
+  state          USState
   zip            String
   industry       String
 
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
 
   createdAt DateTime @default(now())
@@ -46,11 +60,11 @@ model Driver {
   image   String?
   address String
   city    String
-  state   String
+  state   USState
   zip     String
   status  DriverStatus
 
-  user               User              @relation(fields: [userId], references: [id])
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders             Order[]           @relation("CurrentDriverOrders")
   assignments        OrderAssignment[]
   history            OrderHistory[]
@@ -64,7 +78,7 @@ model Driver {
 model Item {
   id     String     @id @default(uuid())
   name   String     @unique
-  status ItemStatus
+  status ItemStatus @default(ACTIVE)
 
   orders Order[]
 
@@ -74,16 +88,18 @@ model Item {
 
 model Order {
   id              String      @id @default(uuid())
-  clientId        String
+  clientId        String?
   itemId          String
   currentDriverId String?
-  currentCity     String
-  deliveryCity    String
+  currentCity     String?
+  deliveryCity    String?
   specialNote     String?
-  status          OrderStatus
+  status          OrderStatus @default(CREATED)
   type            OrderType
+  createdById     String
+  createdByRole   OrderRole
 
-  client          Client            @relation(fields: [clientId], references: [id])
+  client          Client?           @relation(fields: [clientId], references: [id])
   item            Item              @relation(fields: [itemId], references: [id])
   currentDriver   Driver?           @relation("CurrentDriverOrders", fields: [currentDriverId], references: [id])
   orderTransfers  OrderTransfer[]
@@ -159,8 +175,8 @@ model Notification {
 }
 
 model PickupDetails {
-  id             String @id @default(uuid())
-  orderId        String @unique
+  id             String  @id @default(uuid())
+  orderId        String  @unique
   contactName    String
   email          String
   phone          String
@@ -168,7 +184,7 @@ model PickupDetails {
   companyAddress String
   suiteNumber    String
   city           String
-  state          String
+  state          USState
   zipCode        String
 
   order Order @relation(fields: [orderId], references: [id])
@@ -178,9 +194,9 @@ model PickupDetails {
 }
 
 model DeliveryDetails {
-  id             String @id @default(uuid())
-  orderId        String @unique
-  serviceType    String
+  id             String  @id @default(uuid())
+  orderId        String  @unique
+  serviceType    String?
   contactName    String
   email          String
   phone          String
@@ -188,7 +204,7 @@ model DeliveryDetails {
   companyAddress String
   suiteNumber    String
   city           String
-  state          String
+  state          USState
   zipCode        String
 
   order Order @relation(fields: [orderId], references: [id])
@@ -233,4 +249,62 @@ enum TransferStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum OrderRole {
+  CLIENT
+  ADMIN
+}
+
+enum USState {
+  AL
+  AK
+  AZ
+  AR
+  CA
+  CO
+  CT
+  DE
+  FL
+  GA
+  HI
+  ID
+  IL
+  IN
+  IA
+  KS
+  KY
+  LA
+  ME
+  MD
+  MA
+  MI
+  MN
+  MS
+  MO
+  MT
+  NE
+  NV
+  NH
+  NJ
+  NM
+  NY
+  NC
+  ND
+  OH
+  OK
+  OR
+  PA
+  RI
+  SC
+  SD
+  TN
+  TX
+  UT
+  VT
+  VA
+  WA
+  WV
+  WI
+  WY
 }

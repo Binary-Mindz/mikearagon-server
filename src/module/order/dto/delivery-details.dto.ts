@@ -1,0 +1,57 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsString } from 'class-validator';
+import { USState } from 'src/common/enums/us-state.enum';
+
+export class DeliveryAddressDto {
+  @ApiProperty({
+    example: 'John Doe',
+  })
+  @IsString()
+  contactName!: string;
+
+  @ApiProperty({
+    example: 'example@email',
+  })
+  @IsString()
+  email!: string;
+
+  @ApiProperty({
+    example: '1234567890',
+  })
+  @IsString()
+  phone!: string;
+
+  @ApiProperty({
+    example: 'Example Company',
+  })
+  @IsString()
+  companyName!: string;
+
+  @ApiProperty({
+    example: '123 Main St',
+  })
+  @IsString()
+  companyAddress!: string;
+
+  @ApiProperty({
+    example: 'Apt 123',
+  })
+  @IsString()
+  suiteNumber!: string;
+
+  @ApiProperty({
+    example: 'New York',
+  })
+  @IsString()
+  city!: string;
+
+  @ApiProperty({ example: USState.NV })
+  @IsEnum(USState, { message: 'Invalid US state' })
+  state!: USState;
+
+  @ApiProperty({
+    example: '12345',
+  })
+  @IsString()
+  zipCode!: string;
+}
