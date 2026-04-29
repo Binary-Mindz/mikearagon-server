@@ -11,6 +11,8 @@ import { ItemModule } from './module/item/item.module';
 import { MailModule } from './module/mail/mail.module';
 import { OrderModule } from './module/order/order.module';
 import { UserModule } from './module/user/user.module';
+import { DashboardModule } from './module/dashboard/dashboard.module';
+import { DriverModule } from './module/driver/driver.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { UserModule } from './module/user/user.module';
     OrderModule,
     ItemModule,
     MailModule,
+    DashboardModule,
+    DriverModule,
     // LoggerModule.forRoot({
     //   pinoHttp: {
     //     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',

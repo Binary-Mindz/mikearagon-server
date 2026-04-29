@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
+import { USState } from 'src/common/enums/us-state.enum';
 
 export class OrderAddressDto {
   @ApiProperty({
@@ -44,11 +45,9 @@ export class OrderAddressDto {
   @IsString()
   city!: string;
 
-  @ApiProperty({
-    example: 'NY',
-  })
-  @IsString()
-  state!: string;
+  @ApiProperty({ example: USState.NV })
+  @IsEnum(USState, { message: 'Invalid US state' })
+  state!: USState;
 
   @ApiProperty({
     example: '12345',
