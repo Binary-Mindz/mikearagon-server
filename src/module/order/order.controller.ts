@@ -51,50 +51,61 @@ export class OrderController {
     return this.adminOrderService.createOrder(createOrderDto, userId);
   }
 
-  @ApiOperation({ summary: 'Get my orders list as client' })
-  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
-  @Roles(Role.CLIENT)
+  @ApiOperation({ summary: 'Get my orders list as client or admin' })
+  @UseGuards(JwtAuthGuard, RolesGuard, ProfileGuard)
+  @Roles(Role.CLIENT, Role.ADMIN)
   @Get('client/my')
   getMyOrders(
     @CurrentClient('id') clientId: string,
+    @GetUser('sub') userId: string,
     @Query() query: GetOrdersQueryDto,
   ) {
-    return this.orderService.getMyOrders(clientId, query);
+    return this.orderService.getMyOrders(query, clientId, userId);
   }
 
-  @ApiOperation({ summary: 'Get my order details as client' })
+  @ApiOperation({ summary: 'Get my order details' })
   @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.ADMIN)
   @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
-  @Get('client/my/:id')
+  @Get('my/:id')
   getMyOrderDetails(
     @Param('id') id: string,
     @CurrentClient('id') clientId: string,
+    @GetUser('sub') userId: string,
   ) {
-    return this.orderService.getMyOrderDetails(id, clientId);
+    return this.orderService.getMyOrderDetails(id, clientId, userId);
   }
 
-  @ApiOperation({ summary: 'Update order by client' })
-  @UseGuards(JwtAuthGuard, ProfileGuard)
+  @ApiOperation({ summary: 'Update order by client or admin' })
+  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
+  @Roles(Role.CLIENT, Role.ADMIN)
   @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Patch(':id')
   updateOrder(
     @Param('id') orderId: string,
     @Body() updateOrderDto: UpdateOrderDto,
     @CurrentClient('id') clientId: string,
+    @GetUser('sub') userId: string,
   ) {
-    return this.orderService.updateOrder(orderId, updateOrderDto, clientId);
+    return this.orderService.updateOrder(
+      orderId,
+      updateOrderDto,
+      clientId,
+      userId,
+    );
   }
 
   // cancel order by client before pickup
-  @ApiOperation({ summary: 'Cancel order by client' })
-  @UseGuards(JwtAuthGuard, ProfileGuard)
+  @ApiOperation({ summary: 'Cancel order by client or admin' })
+  @UseGuards(JwtAuthGuard, ProfileGuard, RolesGuard)
+  @Roles(Role.CLIENT, Role.ADMIN)
   @ApiParam({ name: 'id', type: 'string', description: 'Order ID' })
   @Patch(':id/cancel')
   cancelOrder(
     @Param('id') orderId: string,
     @CurrentClient('id') clientId: string,
+    @GetUser('sub') userId: string,
   ) {
-    return this.orderService.cancelOrder(orderId, clientId);
+    return this.orderService.cancelOrder(orderId, clientId, userId);
   }
 }

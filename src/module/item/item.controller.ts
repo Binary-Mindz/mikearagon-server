@@ -21,7 +21,6 @@ export class ItemController {
     return this.itemService.create(createItemDto);
   }
 
-  // Get all items
   @ApiOperation({ summary: 'Get all items' })
   @Get()
   findAll() {

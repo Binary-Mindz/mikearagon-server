@@ -48,8 +48,8 @@ export class ProfileGuard implements CanActivate {
         break;
       }
 
-      default:
-        throw new ForbiddenException('Invalid role');
+      // default:
+      //   throw new ForbiddenException('Invalid role');
     }
 
     return true;
