@@ -175,4 +175,25 @@ export class AdminOrderService {
       },
     });
   }
+
+  async getOrdersByClientId(clientId: string) {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        clientId,
+      },
+      include: {
+        item: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        pickupDetails: true,
+        deliveryDetails: true,
+        currentDriver: true,
+      },
+    });
+
+    return ApiResponse.success('Orders fetched successfully', orders);
+  }
 }

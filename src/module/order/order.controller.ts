@@ -86,6 +86,13 @@ export class OrderController {
     return this.adminOrderService.getOthersOrders(query);
   }
 
+  @Get('others/:clientId')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  getOrdersByClientId(@Param('clientId') clientId: string) {
+    return this.adminOrderService.getOrdersByClientId(clientId);
+  }
+
   @ApiOperation({ summary: 'Update order by client or admin' })
   @UseGuards(ProfileGuard, RolesGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
