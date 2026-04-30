@@ -56,7 +56,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Get my orders list as client or admin' })
   @UseGuards(RolesGuard, ProfileGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
-  @Get('client/my')
+  @Get('my')
   getMyOrders(
     @CurrentClient('id') clientId: string,
     @GetUser('sub') userId: string,
