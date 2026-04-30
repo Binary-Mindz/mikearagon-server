@@ -62,7 +62,7 @@ export class OrderController {
     @GetUser('sub') userId: string,
     @Query() query: GetOrdersQueryDto,
   ) {
-    return this.orderService.getMyOrders(query, clientId, userId);
+    return this.orderService.getOrders(query, clientId, userId);
   }
 
   @ApiOperation({ summary: 'Get my order details' })
@@ -86,11 +86,17 @@ export class OrderController {
     return this.adminOrderService.getOthersOrders(query);
   }
 
+  @ApiOperation({
+    summary: "Get all other client's orders by client id as admin",
+  })
   @Get('others/:clientId')
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN)
-  getOrdersByClientId(@Param('clientId') clientId: string) {
-    return this.adminOrderService.getOrdersByClientId(clientId);
+  getOrdersByClientId(
+    @Param('clientId') clientId: string,
+    @Query() query: GetOrdersQueryDto,
+  ) {
+    return this.orderService.getOrders(query, clientId);
   }
 
   @ApiOperation({ summary: 'Update order by client or admin' })
