@@ -33,6 +33,22 @@ export class UserService {
     return ApiResponse.success('User fetched successfully', user);
   }
 
+  async getClient(clientId: string) {
+    const client = await this.prisma.user.findFirst({
+      where: { client: { id: clientId } },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        profileImg: true,
+        phone: true,
+        client: true,
+      },
+    });
+
+    return ApiResponse.success('Client fetched successfully', client);
+  }
+
   async updatePersonalInfo(userId: string, dto: UpdatePersonalInfoDto) {
     const user = await this.prisma.user.update({
       where: { id: userId },
