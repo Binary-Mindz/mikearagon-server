@@ -18,7 +18,7 @@ export class ClientController {
     return this.clientService.getStats(clientId);
   }
 
-  @ApiOperation({ summary: 'Get Client Analytics' })
+  @ApiOperation({ summary: 'Get Client Dashboard Analytics' })
   @Get('analytics')
   @UseGuards(JwtAuthGuard, RolesGuard, ProfileGuard)
   @ApiQuery({ name: 'filter', enum: ['daily', 'weekly', 'monthly'] })

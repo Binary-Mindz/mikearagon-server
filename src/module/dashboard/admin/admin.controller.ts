@@ -1,5 +1,5 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -14,6 +14,13 @@ import { AdminService } from './admin.service';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @ApiOperation({ summary: 'Get admin dashboard stats' })
+  @Get('stats')
+  getStats() {
+    return this.adminService.getStats();
+  }
+
+  @ApiOperation({ summary: 'Get admin dashboard analytics' })
   @Get('analytics')
   @ApiQuery({ name: 'filter', enum: ['daily', 'weekly', 'monthly'] })
   @ApiQuery({ name: 'ordersSelection', enum: ['admin', 'all'] })

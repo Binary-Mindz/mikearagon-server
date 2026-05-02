@@ -7,7 +7,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JwtAuthGuard } from 'src/module/auth/guards/jwt-auth.guard';
 import { DeliveryService } from './delivery.service';
 
-@ApiTags('Driver Delivery')
+@ApiTags('Driver')
 @Controller('delivery')
 export class DeliveryController {
   constructor(private readonly deliveryService: DeliveryService) {}

@@ -1,11 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { OrderType, Prisma } from '@prisma/client';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 
 @Injectable()
 export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getStats() {
+    const [totalOrders, deliveryOrders, pickupOrders, totalUsers] =
+      await Promise.all([
+        this.prisma.order.count(),
+        this.prisma.order.count({
+          where: {
+            type: OrderType.DELIVERY,
+          },
+        }),
+        this.prisma.order.count({
+          where: {
+            type: OrderType.PICKUP,
+          },
+        }),
+        this.prisma.client.count(),
+      ]);
+
+    return ApiResponse.success('Stats fetched successfully', {
+      totalOrders,
+      deliveryOrders,
+      pickupOrders,
+      totalUsers,
+    });
+  }
 
   async getAnalytics(
     filter: 'daily' | 'weekly' | 'monthly',
