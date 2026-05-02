@@ -12,7 +12,7 @@ import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CurrentClient } from 'src/common/decorators/get-client.decorator';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { SearchPaginationDto } from 'src/common/dto/search-pagination.dto';
+import { SearchPaginationDto } from 'src/common/dto/pagination.dto';
 import { Role } from 'src/common/enums/role.enum';
 import { ProfileGuard } from 'src/common/guards/profile.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';

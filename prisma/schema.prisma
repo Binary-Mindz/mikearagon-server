@@ -55,14 +55,15 @@ model Client {
 }
 
 model Driver {
-  id      String       @id @default(uuid())
-  userId  String       @unique
-  image   String?
-  address String
-  city    String
-  state   USState
-  zip     String
-  status  DriverStatus
+  id       String       @id @default(uuid())
+  userId   String       @unique
+  fcmToken String?
+  image    String?
+  address  String
+  city     String
+  state    USState
+  zip      String
+  status   DriverStatus
 
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders             Order[]           @relation("CurrentDriverOrders")
@@ -159,16 +160,16 @@ model OrderHistory {
 }
 
 model Notification {
-  id      String  @id @default(uuid())
+  id      String           @id @default(uuid())
   userId  String
-  orderId String
-  type    String
+  orderId String?
+  type    NotificationType
   title   String
   message String
-  isRead  Boolean @default(false)
+  isRead  Boolean          @default(false)
 
-  order Order @relation(fields: [orderId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id])
+  user  User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -254,6 +255,15 @@ enum TransferStatus {
 enum OrderRole {
   CLIENT
   ADMIN
+}
+
+enum NotificationType {
+  ORDER_ACCEPTED
+  ORDER_PICKED_UP
+  ORDER_DELIVERED
+  TRANSFER_REQUEST
+  TRANSFER_ACCEPTED
+  TRANSFER_REJECTED
 }
 
 enum USState {

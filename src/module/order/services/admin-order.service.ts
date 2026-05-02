@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ItemStatus } from '@prisma/client';
-import { SearchPaginationDto } from 'src/common/dto/search-pagination.dto';
+import { SearchPaginationDto } from 'src/common/dto/pagination.dto';
 import { Role } from 'src/common/enums/role.enum';
 import { ApiResponse } from 'src/common/response/api-response';
 import { PrismaService } from 'src/database/prisma/prisma.service';
