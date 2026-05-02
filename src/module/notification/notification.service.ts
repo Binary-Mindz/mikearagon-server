@@ -6,7 +6,10 @@ import { SendNotification } from './dto/send-notification.dto';
 
 @Injectable()
 export class NotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    // private readonly firebaseService: FirebaseService,
+  ) {}
 
   async sendNotification(data: SendNotification) {
     // Save to DB
@@ -20,8 +23,19 @@ export class NotificationService {
       },
     });
 
-    // Send push
-    // await this.sendPush(data.userId, data.title, data.message);
+    // 2. Get driver token
+    // const driver = await this.prisma.driver.findFirst({
+    //   where: { userId: data.userId },
+    // });
+
+    // if (!driver?.fcmToken) return;
+
+    // 3. Send push
+    // await this.firebaseService.sendToDevice(
+    //   driver.fcmToken,
+    //   data.title,
+    //   data.message,
+    // );
 
     return ApiResponse.success('Notification sent successfully');
   }
