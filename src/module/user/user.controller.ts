@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
@@ -18,6 +18,14 @@ export class UserController {
   @Get('me')
   getMe(@GetUser('sub') userId: string) {
     return this.userService.getMe(userId);
+  }
+
+  @ApiOperation({ summary: 'Get client' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Get('/:clientId')
+  getClient(@Param('clientId') clientId: string) {
+    return this.userService.getClient(clientId);
   }
 
   @ApiOperation({ summary: 'Update personal info as client' })

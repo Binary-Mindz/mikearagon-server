@@ -12,7 +12,7 @@ import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CurrentClient } from 'src/common/decorators/get-client.decorator';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { SearchPaginationDto } from 'src/common/dto/search-pagination.dto';
+import { SearchPaginationDto } from 'src/common/dto/pagination.dto';
 import { Role } from 'src/common/enums/role.enum';
 import { ProfileGuard } from 'src/common/guards/profile.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -56,13 +56,13 @@ export class OrderController {
   @ApiOperation({ summary: 'Get my orders list as client or admin' })
   @UseGuards(RolesGuard, ProfileGuard)
   @Roles(Role.CLIENT, Role.ADMIN)
-  @Get('client/my')
+  @Get('my')
   getMyOrders(
     @CurrentClient('id') clientId: string,
     @GetUser('sub') userId: string,
     @Query() query: GetOrdersQueryDto,
   ) {
-    return this.orderService.getMyOrders(query, clientId, userId);
+    return this.orderService.getOrders(query, clientId, userId);
   }
 
   @ApiOperation({ summary: 'Get my order details' })
@@ -84,6 +84,19 @@ export class OrderController {
   @Roles(Role.ADMIN)
   getOthersOrders(@Query() query: SearchPaginationDto) {
     return this.adminOrderService.getOthersOrders(query);
+  }
+
+  @ApiOperation({
+    summary: "Get all other client's orders by client id as admin",
+  })
+  @Get('others/:clientId')
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  getOrdersByClientId(
+    @Param('clientId') clientId: string,
+    @Query() query: GetOrdersQueryDto,
+  ) {
+    return this.orderService.getOrders(query, clientId);
   }
 
   @ApiOperation({ summary: 'Update order by client or admin' })
