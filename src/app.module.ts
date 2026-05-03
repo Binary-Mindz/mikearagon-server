@@ -13,6 +13,8 @@ import { OrderModule } from './module/order/order.module';
 import { UserModule } from './module/user/user.module';
 import { DashboardModule } from './module/dashboard/dashboard.module';
 import { DriverModule } from './module/driver/driver.module';
+import { NotificationModule } from './module/notification/notification.module';
+import { FirebaseModule } from './module/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { DriverModule } from './module/driver/driver.module';
     MailModule,
     DashboardModule,
     DriverModule,
+    NotificationModule,
+    FirebaseModule,
     // LoggerModule.forRoot({
     //   pinoHttp: {
     //     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',

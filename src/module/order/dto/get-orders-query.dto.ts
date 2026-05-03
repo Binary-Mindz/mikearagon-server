@@ -30,7 +30,6 @@ export class GetOrdersQueryDto {
 
   @ApiPropertyOptional({
     description: 'Search by order ID or package type',
-    example: 'flower',
   })
   @IsOptional()
   @IsString()

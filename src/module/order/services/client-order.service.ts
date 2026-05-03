@@ -74,7 +74,7 @@ export class ClientOrderService {
     });
   }
 
-  async getMyOrders(
+  async getOrders(
     query: GetOrdersQueryDto,
     clientId?: string,
     userId?: string,
