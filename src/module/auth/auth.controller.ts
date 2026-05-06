@@ -18,6 +18,12 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiOperation({ summary: 'User login' })
+  @Post('login')
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto.email, dto.password);
+  }
+
   @ApiOperation({ summary: 'Client registration' })
   @Post('register/client')
   registerClient(@Body() dto: ClientRegisterDto) {
@@ -32,6 +38,12 @@ export class AuthController {
     return this.authService.registerDriver(dto);
   }
 
+  // refresh token handling
+  // @Post('refresh-token')
+  // refreshToken(@Body() dto: RefreshTokenDto) {
+  //   return this.authService.refreshToken(dto.refreshToken);
+  // }
+
   @ApiOperation({
     summary: 'Email verification and otp verification',
     description:
@@ -41,12 +53,6 @@ export class AuthController {
   @ApiParam({ name: 'token' })
   verifyEmail(@Param('token') token: string, @Body() dto: VerifyTokenTypeDto) {
     return this.authService.verifyEmail(token, dto.type);
-  }
-
-  @ApiOperation({ summary: 'User login' })
-  @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto.email, dto.password);
   }
 
   // Change password
