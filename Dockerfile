@@ -2,7 +2,7 @@
 FROM node:20 AS builder
 WORKDIR /app
 
-# # Install pnpm globally
+# Install pnpm globally
 RUN npm install -g pnpm
 
 # Copy package files first for dependency caching
