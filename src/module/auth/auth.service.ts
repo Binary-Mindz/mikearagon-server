@@ -300,12 +300,12 @@ export class AuthService {
     if (!refreshToken) {
       throw new BadRequestException('Refresh token is required');
     }
-    // 1. Verify token
+    // Verify token
     const decoded = this.jwtService.verify(refreshToken, {
       secret: this.configService.get('jwt.refreshSecret'),
     });
 
-    // 2. Find user + stored token
+    // Find user + stored token
     const user = await this.prisma.user.findUnique({
       where: { id: decoded.sub },
     });
@@ -314,7 +314,7 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     }
 
-    // 3. Compare hashed token
+    // Compare hashed token
     const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isValid) {

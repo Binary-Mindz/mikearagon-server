@@ -103,6 +103,7 @@ export class AuthController {
   }
 
   // refresh token route
+  @ApiOperation({ summary: 'Refresh token' })
   @Post('refresh-token')
   async refreshTokenHandler(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies.refreshToken as string;
