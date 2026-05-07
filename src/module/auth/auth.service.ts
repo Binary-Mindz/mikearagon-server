@@ -76,7 +76,15 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
     const tokens = this.generateTokens(user.id, user.email, user.role);
-    return ApiResponse.success('Login successful', tokens);
+
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefreshToken },
+    });
+
+    return tokens;
   }
 
   async registerDriver(dto: DriverRegisterDto) {
