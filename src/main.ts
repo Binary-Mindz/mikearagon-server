@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -13,6 +14,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
   app.use(helmet());
+  app.use(cookieParser());
   app.enableCors({
     origin: ['http://localhost:3000'],
     credentials: true,

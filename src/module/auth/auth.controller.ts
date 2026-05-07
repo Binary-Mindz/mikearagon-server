@@ -1,9 +1,19 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import type { Request, Response } from 'express';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ApiResponse } from 'src/common/response/api-response';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ClientRegisterDto } from './dto/client-register.dto';
@@ -20,8 +30,22 @@ export class AuthController {
 
   @ApiOperation({ summary: 'User login' })
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto.email, dto.password);
+  async login(@Body() dto: LoginDto, @Res() res: Response) {
+    const result = await this.authService.login(dto.email, dto.password);
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.json(
+      ApiResponse.success('User logged in successfully', {
+        token: result.accessToken,
+      }),
+    );
   }
 
   @ApiOperation({ summary: 'Client registration' })
@@ -76,5 +100,27 @@ export class AuthController {
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
+  }
+
+  // refresh token route
+  @ApiOperation({ summary: 'Refresh token' })
+  @Post('refresh-token')
+  async refreshTokenHandler(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies.refreshToken as string;
+    const result = await this.authService.refreshTokenHandler(refreshToken);
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.json(
+      ApiResponse.success('Token refreshed successfully', {
+        token: result.accessToken,
+      }),
+    );
   }
 }
