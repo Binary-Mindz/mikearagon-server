@@ -3,6 +3,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -293,5 +294,41 @@ export class AuthService {
     });
 
     return ApiResponse.success('Password reset successfully');
+  }
+
+  async refreshTokenHandler(refreshToken: string) {
+    if (!refreshToken) {
+      throw new BadRequestException('Refresh token is required');
+    }
+    // 1. Verify token
+    const decoded = this.jwtService.verify(refreshToken, {
+      secret: this.configService.get('jwt.refreshSecret'),
+    });
+
+    // 2. Find user + stored token
+    const user = await this.prisma.user.findUnique({
+      where: { id: decoded.sub },
+    });
+
+    if (!user || !user.refreshToken) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    // 3. Compare hashed token
+    const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+
+    if (!isValid) {
+      throw new ForbiddenException('Access Denied');
+    }
+
+    const tokens = this.generateTokens(user.id, user.email, user.role);
+
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: hashedRefreshToken },
+    });
+
+    return tokens;
   }
 }

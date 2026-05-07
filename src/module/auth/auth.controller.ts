@@ -1,7 +1,15 @@
-import { Body, Controller, Param, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -30,7 +38,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     return res.json(
@@ -92,5 +100,26 @@ export class AuthController {
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
+  }
+
+  // refresh token route
+  @Post('refresh-token')
+  async refreshTokenHandler(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies.refreshToken as string;
+    const result = await this.authService.refreshTokenHandler(refreshToken);
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return res.json(
+      ApiResponse.success('Token refreshed successfully', {
+        token: result.accessToken,
+      }),
+    );
   }
 }
