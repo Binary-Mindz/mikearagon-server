@@ -1,13 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `refreshToken` on the `User` table. All the data in the column will be lost.
-  - A unique constraint covering the columns `[phone]` on the table `User` will be added. If there are existing duplicate values, this will fail.
-  - Added the required column `fullName` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `phone` to the `User` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `role` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('ADMIN', 'CLIENT', 'DRIVER');
 
@@ -26,11 +16,42 @@ CREATE TYPE "OrderType" AS ENUM ('DELIVERY', 'PICKUP');
 -- CreateEnum
 CREATE TYPE "TransferStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
 
--- AlterTable
-ALTER TABLE "User" DROP COLUMN "refreshToken",
-ADD COLUMN     "fullName" TEXT NOT NULL,
-ADD COLUMN     "phone" TEXT NOT NULL,
-ADD COLUMN     "role" "Role" NOT NULL;
+-- CreateEnum
+CREATE TYPE "OrderRole" AS ENUM ('CLIENT', 'ADMIN');
+
+-- CreateEnum
+CREATE TYPE "NotificationType" AS ENUM ('ORDER_ACCEPTED', 'ORDER_PICKED_UP', 'ORDER_DELIVERED', 'TRANSFER_REQUEST', 'TRANSFER_ACCEPTED', 'TRANSFER_REJECTED');
+
+-- CreateEnum
+CREATE TYPE "USState" AS ENUM ('AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY');
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "fullName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" "Role" NOT NULL,
+    "profileImg" TEXT,
+    "refreshToken" TEXT,
+    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "VerificationToken" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "VerificationToken_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Client" (
@@ -38,9 +59,10 @@ CREATE TABLE "Client" (
     "userId" TEXT NOT NULL,
     "companyName" TEXT NOT NULL,
     "companyAddress" TEXT NOT NULL,
+    "companyLogo" TEXT,
     "suiteNumber" TEXT NOT NULL,
     "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
+    "state" "USState" NOT NULL,
     "zip" TEXT NOT NULL,
     "industry" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -53,10 +75,11 @@ CREATE TABLE "Client" (
 CREATE TABLE "Driver" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "fcmToken" TEXT,
     "image" TEXT,
     "address" TEXT NOT NULL,
     "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
+    "state" "USState" NOT NULL,
     "zip" TEXT NOT NULL,
     "status" "DriverStatus" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -69,7 +92,7 @@ CREATE TABLE "Driver" (
 CREATE TABLE "Item" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "status" "ItemStatus" NOT NULL,
+    "status" "ItemStatus" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -79,14 +102,16 @@ CREATE TABLE "Item" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
-    "clientId" TEXT NOT NULL,
+    "clientId" TEXT,
     "itemId" TEXT NOT NULL,
     "currentDriverId" TEXT,
-    "currentCity" TEXT NOT NULL,
-    "deliveryCity" TEXT NOT NULL,
+    "currentCity" TEXT,
+    "deliveryCity" TEXT,
     "specialNote" TEXT,
-    "status" "OrderStatus" NOT NULL,
+    "status" "OrderStatus" NOT NULL DEFAULT 'CREATED',
     "type" "OrderType" NOT NULL,
+    "createdById" TEXT NOT NULL,
+    "createdByRole" "OrderRole" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -134,8 +159,8 @@ CREATE TABLE "OrderHistory" (
 CREATE TABLE "Notification" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "orderId" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
+    "orderId" TEXT,
+    "type" "NotificationType" NOT NULL,
     "title" TEXT NOT NULL,
     "message" TEXT NOT NULL,
     "isRead" BOOLEAN NOT NULL DEFAULT false,
@@ -156,7 +181,7 @@ CREATE TABLE "PickupDetails" (
     "companyAddress" TEXT NOT NULL,
     "suiteNumber" TEXT NOT NULL,
     "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
+    "state" "USState" NOT NULL,
     "zipCode" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -168,7 +193,7 @@ CREATE TABLE "PickupDetails" (
 CREATE TABLE "DeliveryDetails" (
     "id" TEXT NOT NULL,
     "orderId" TEXT NOT NULL,
-    "serviceType" TEXT NOT NULL,
+    "serviceType" TEXT,
     "contactName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
@@ -176,13 +201,22 @@ CREATE TABLE "DeliveryDetails" (
     "companyAddress" TEXT NOT NULL,
     "suiteNumber" TEXT NOT NULL,
     "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
+    "state" "USState" NOT NULL,
     "zipCode" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "DeliveryDetails_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "VerificationToken_token_key" ON "VerificationToken"("token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Client_userId_key" ON "Client"("userId");
@@ -205,17 +239,17 @@ CREATE UNIQUE INDEX "PickupDetails_orderId_key" ON "PickupDetails"("orderId");
 -- CreateIndex
 CREATE UNIQUE INDEX "DeliveryDetails_orderId_key" ON "DeliveryDetails"("orderId");
 
--- CreateIndex
-CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+-- AddForeignKey
+ALTER TABLE "VerificationToken" ADD CONSTRAINT "VerificationToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Client" ADD CONSTRAINT "Client_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Client" ADD CONSTRAINT "Client_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Driver" ADD CONSTRAINT "Driver_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Driver" ADD CONSTRAINT "Driver_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -245,7 +279,7 @@ ALTER TABLE "OrderHistory" ADD CONSTRAINT "OrderHistory_driverId_fkey" FOREIGN K
 ALTER TABLE "OrderHistory" ADD CONSTRAINT "OrderHistory_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Notification" ADD CONSTRAINT "Notification_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
