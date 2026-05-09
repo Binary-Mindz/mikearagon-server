@@ -73,8 +73,26 @@ model Driver {
   orderTransfersFrom OrderTransfer[]   @relation("FromDriver")
   orderTransfersTo   OrderTransfer[]   @relation("ToDriver")
 
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  attendances Attendance[]
+}
+
+model Attendance {
+  id           String           @id @default(uuid())
+  driverId     String
+  date         DateTime
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  status       AttendanceStatus
+  shiftHours   Int? // minutes worked
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  driver Driver @relation(fields: [driverId], references: [id])
+
+  @@unique([driverId, date])
 }
 
 model Item {
@@ -256,6 +274,12 @@ enum TransferStatus {
 enum OrderRole {
   CLIENT
   ADMIN
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
 }
 
 enum NotificationType {
