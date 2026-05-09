@@ -15,6 +15,7 @@ import { DashboardModule } from './module/dashboard/dashboard.module';
 import { DriverModule } from './module/driver/driver.module';
 import { NotificationModule } from './module/notification/notification.module';
 import { FirebaseModule } from './module/firebase/firebase.module';
+import { SchedulesModule } from './module/schedules/schedule.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { FirebaseModule } from './module/firebase/firebase.module';
     DriverModule,
     NotificationModule,
     FirebaseModule,
+    SchedulesModule,
     // LoggerModule.forRoot({
     //   pinoHttp: {
     //     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
