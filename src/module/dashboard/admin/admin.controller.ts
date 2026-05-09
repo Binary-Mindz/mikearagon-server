@@ -6,6 +6,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JwtAuthGuard } from 'src/module/auth/guards/jwt-auth.guard';
 import { AdminService } from './admin.service';
+import { AttendanceQueryDto } from './dto/attendance-query.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
@@ -30,5 +31,17 @@ export class AdminController {
     @GetUser('sub') userId: string,
   ) {
     return this.adminService.getAnalytics(filter, ordersSelection, userId);
+  }
+
+  @Get('attendance/summary')
+  @ApiOperation({ summary: 'Get admin dashboard attendance summary' })
+  getSummary() {
+    return this.adminService.getSummary();
+  }
+
+  @Get('attendance')
+  @ApiOperation({ summary: 'Get admin dashboard attendance' })
+  getAttendance(@Query() query: AttendanceQueryDto) {
+    return this.adminService.getAttendance(query);
   }
 }
