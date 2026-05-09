@@ -30,14 +30,14 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/mikearagon-server:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/mikearagon-server:${{ github.sha }}
 
-      - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/server
-            docker compose pull
-            docker compose up -d --force-recreate
-            docker image prune -f
+      # - name: Deploy to server
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}
+      #     username: ${{ secrets.SERVER_USER }}
+      #     key: ${{ secrets.SERVER_SSH_KEY }}
+      #     script: |
+      #       cd /home/ubuntu/server
+      #       docker compose pull
+      #       docker compose up -d --force-recreate
+      #       docker image prune -f
