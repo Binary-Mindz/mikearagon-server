@@ -8,7 +8,7 @@ import { JwtAuthGuard } from 'src/module/auth/guards/jwt-auth.guard';
 import { DeliveryService } from './delivery.service';
 
 @ApiTags('Driver')
-@Controller('delivery')
+@Controller('driver/delivery')
 export class DeliveryController {
   constructor(private readonly deliveryService: DeliveryService) {}
 
